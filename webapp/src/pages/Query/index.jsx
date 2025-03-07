@@ -3,7 +3,7 @@ import { AppContext } from '../../context/AppContext';
 import { Button, Typography, Paper, Box, Select, MenuItem, FormControl, InputLabel, Grid, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = "http://localhost:8290/retrieve";
+const BACKEND_URL = "http://localhost:8000/retrieve";
 
 function QueryPage() {
   const {
@@ -55,21 +55,34 @@ function QueryPage() {
 
     setReturnedText([]);
 
-    const formData = new FormData();
-    formData.append('selectedProvider', selectedProvider);
-    formData.append('vectorDBAPIKey', vectorDBAPIKey);
-    formData.append('collectionName', collectionName);
-    formData.append('embeddingModel', embeddingModel);
-    formData.append('embeddingModelAPIKey', embeddingModelAPIKey);
-    formData.append('chromaURL', chromaURL)
-    formData.append('maxChunks', maxChunks);
-    formData.append('minSimilarity', minSimilarity)
-    formData.append('query', userQuery);
+    const requestData = {
+      vectordb_provider: selectedProvider,
+      pinecone_apikey: vectorDBAPIKey,
+      collection_name: collectionName,
+      embedding_model: embeddingModel,
+      embedding_model_apikey: embeddingModelAPIKey,
+      chroma_url: chromaURL,
+      max_retrieve_chunks: maxChunks,
+      min_similarity_threshold: minSimilarity,
+      user_query: userQuery
+    };
+    // formData.append('selectedProvider', selectedProvider);
+    // formData.append('vectorDBAPIKey', vectorDBAPIKey);
+    // formData.append('collectionName', collectionName);
+    // formData.append('embeddingModel', embeddingModel);
+    // formData.append('embeddingModelAPIKey', embeddingModelAPIKey);
+    // formData.append('chromaURL', chromaURL)
+    // formData.append('maxChunks', maxChunks);
+    // formData.append('minSimilarity', minSimilarity)
+    // formData.append('query', userQuery);
 
     try {
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
       })
 
       if (!response.ok) {
@@ -78,6 +91,7 @@ function QueryPage() {
       }
 
       const data = await response.json();
+      console.log(JSON.stringify(data));
       if (data.length > 0) {
         setReturnedText(data)
       } else {
