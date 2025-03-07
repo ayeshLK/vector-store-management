@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 router = APIRouter()
 
 
-@router.post("/upload", status_code=status.HTTP_200_OK)
+@router.post("/upload")
 async def upload(
         request_id: str = Form(..., title="Request ID"),
         file: UploadFile = File(..., title="File")):
